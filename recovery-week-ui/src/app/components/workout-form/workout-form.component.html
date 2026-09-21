@@ -1,0 +1,17 @@
+<div *ngIf="loading">Loading workout types...</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<label for="workoutType">Workout Type</label>
+<select
+  id="workoutType"
+  [(ngModel)]="selectedTypeId"
+  [disabled]="loading || !!error"
+>
+  <option [ngValue]="null" disabled>Select a type...</option>
+  <option *ngFor="let type of workoutTypes" [ngValue]="type.id">
+    {{ type.name }}
+  </option>
+</select>
+
+<!-- Optional: show the selected value -->
+<p *ngIf="selectedTypeId">Selected ID: {{ selectedTypeId }}</p>

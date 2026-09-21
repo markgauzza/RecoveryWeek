@@ -1,7 +1,20 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from typing import List
 
-router = APIRouter()          # ← this line is required
+from ..database import get_db
+from ..models import WorkoutType
+from ..schemas import WorkoutTypeOut
 
-@router.get("/")
-def read_items():
-    return [{"name": "Item 1"}]
+router = APIRouter(
+    prefix="/workouts",          # final URL will be /api/lookups/...
+    tags=["workouts"]
+)
+
+@router.get("/types", response_model=List[WorkoutTypeOut])
+def get_workout_types(db: Session = Depends(get_db)):
+    """
+    Returns the full list from the lookup table.
+    """
+    items = db.query(WorkoutType).order_by(WorkoutType.WorkoutName).all()
+    return items
