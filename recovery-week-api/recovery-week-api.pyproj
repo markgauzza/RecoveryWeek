@@ -30,6 +30,7 @@
     <Compile Include="app\main.py" />
     <Compile Include="app\models.py" />
     <Compile Include="app\routers\items.py" />
+    <Compile Include="app\routers\workouts.py" />
     <Compile Include="app\schemas.py" />
   </ItemGroup>
   <ItemGroup>
