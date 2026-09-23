@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from datetime import date
 
 
 class WorkoutTypeOut(BaseModel):
@@ -8,6 +9,17 @@ class WorkoutTypeOut(BaseModel):
 
     class Config:
         from_attributes = True   # for SQLAlchemy 2.0 / Pydantic v2
+
+class WorkoutDailySummary(BaseModel):
+    WorkoutDate: date
+    Workouts: str                    # e.g. "Running, Cycling, Yoga"
+    DayOfWeek: str                   # e.g. "Monday"
+    DayParity: str                   # "Odd" or "Even"
+    Sequence: int
+
+    class Config:
+        from_attributes = True
+
 
 class WorkoutOut(BaseModel):
     WorkoutId: int
@@ -37,3 +49,7 @@ class WorkoutResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+WorkoutDailySummary.model_rebuild()
+
+        

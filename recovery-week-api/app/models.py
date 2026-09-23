@@ -6,8 +6,7 @@ class WorkoutType(Base):
     __tablename__ = "WorkoutType"
 
     WorkoutTypeId = Column(Integer, primary_key=True, index=True)
-    WorkoutName = Column(String(100), nullable=False)
-
+    WorkoutName = Column(String(100), nullable=False)    
     workouts = relationship("Workout", back_populates="workout_type")
 
 

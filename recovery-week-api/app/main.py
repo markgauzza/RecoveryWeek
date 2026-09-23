@@ -1,13 +1,15 @@
 from typing import List
 from fastapi import Query
 
+from sqlalchemy import func, case, cast, Date
+
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import get_db
 from app.database import engine, Base
 from app.routers import items
-from app.schemas import WorkoutCreate, WorkoutResponse, WorkoutOut   # ← Pydantic models
-from app.models import Workout          # ← SQLAlchemy model
+from app.schemas import WorkoutCreate, WorkoutResponse, WorkoutOut, WorkoutDailySummary, WorkoutTypeOut
+from app.models import Workout, WorkoutType
 
 
 Base.metadata.create_all(bind=engine)  # for small apps; prefer Alembic later
@@ -62,6 +64,49 @@ def get_workouts(
         .all()
     )
     return workouts
+
+@app.get("/workouts/daily-summary", response_model=List[WorkoutDailySummary])
+def get_daily_workout_summary(db: Session = Depends(get_db)):
+    workout_date = cast(Workout.WorkoutDate, Date).label("WorkoutDate")
+
+    day_of_week = func.dayname(Workout.WorkoutDate).label("DayOfWeek")
+
+    day_parity = case(
+        (func.day(Workout.WorkoutDate) % 2 == 1, "Odd"),
+        else_="Even"
+    ).label("DayParity")
+
+    # IMPORTANT: use WorkoutType (SQLAlchemy), NOT WorkoutTypeOut (Pydantic)
+    workouts_list = func.group_concat(
+        WorkoutType.WorkoutName.distinct().op("ORDER BY")(WorkoutType.WorkoutName)
+    ).label("Workouts")
+
+    sequence = func.max(Workout.Sequence).label("Sequence")
+
+    results = (
+        db.query(
+            workout_date,
+            workouts_list,
+            sequence,
+            day_of_week,
+            day_parity,
+        )
+        .join(WorkoutType, Workout.WorkoutTypeId == WorkoutType.WorkoutTypeId)
+        .group_by(workout_date, day_of_week, day_parity)
+        .order_by(workout_date.desc())
+        .all()
+    )
+
+    return [
+        WorkoutDailySummary(
+            WorkoutDate=row.WorkoutDate,
+            Workouts=row.Workouts or "",
+            Sequence=row.Sequence,
+            DayOfWeek=row.DayOfWeek,
+            DayParity=row.DayParity,
+        )
+        for row in results
+    ] 
 
 from .routers import workouts   # or whatever you named the file
 
