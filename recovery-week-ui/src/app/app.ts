@@ -1,11 +1,17 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink } from '@angular/router';
+import { DailySummaryComponent } from './components/daily-summary/daily-summary.component';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.scss',
+  standalone: true,
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    DailySummaryComponent,  // ← required
+  ],
   templateUrl: './app.html',
+  styleUrl: './app.scss',
 })
 export class App {
   protected readonly title = signal('recovery-week-ui');
