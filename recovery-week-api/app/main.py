@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import get_db
 from app.database import engine, Base
 from app.routers import items
-from app.schemas import WorkoutCreate, WorkoutResponse, WorkoutOut, WorkoutDailySummary, WorkoutTypeOut
+from app.schemas import WorkoutCreate, WorkoutResponse, WorkoutOut, WorkoutDailySummary, WorkoutTypeOut, PaginatedDailySummary
 from app.models import Workout, WorkoutType
 from datetime import datetime
 
@@ -77,25 +77,27 @@ def get_workouts(
     )
     return workouts
 
-@app.get("/workouts/daily-summary", response_model=List[WorkoutDailySummary])
-def get_daily_workout_summary(db: Session = Depends(get_db)):
+@app.get("/workouts/daily-summary", response_model=PaginatedDailySummary)
+def get_daily_workout_summary(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(30, ge=1, le=365),
+    db: Session = Depends(get_db),
+):
     workout_date = cast(Workout.WorkoutDate, Date).label("WorkoutDate")
-
     day_of_week = func.dayname(Workout.WorkoutDate).label("DayOfWeek")
+    sequence = func.max(Workout.Sequence).label("Sequence")
+
 
     day_parity = case(
         (func.day(Workout.WorkoutDate) % 2 == 1, "Odd"),
-        else_="Even"
+        else_="Even",
     ).label("DayParity")
 
-    # IMPORTANT: use WorkoutType (SQLAlchemy), NOT WorkoutTypeOut (Pydantic)
     workouts_list = func.group_concat(
         WorkoutType.WorkoutName.distinct().op("ORDER BY")(WorkoutType.WorkoutName)
     ).label("Workouts")
 
-    sequence = func.max(Workout.Sequence).label("Sequence")
-
-    results = (
+    base_query = (
         db.query(
             workout_date,
             workouts_list,
@@ -105,11 +107,19 @@ def get_daily_workout_summary(db: Session = Depends(get_db)):
         )
         .join(WorkoutType, Workout.WorkoutTypeId == WorkoutType.WorkoutTypeId)
         .group_by(workout_date, day_of_week, day_parity)
+    )
+
+    total = base_query.count()
+
+    results = (
+        base_query
         .order_by(workout_date.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
     )
 
-    return [
+    items = [
         WorkoutDailySummary(
             WorkoutDate=row.WorkoutDate,
             Workouts=row.Workouts or "",
@@ -118,7 +128,15 @@ def get_daily_workout_summary(db: Session = Depends(get_db)):
             DayParity=row.DayParity,
         )
         for row in results
-    ] 
+    ]
+
+    return PaginatedDailySummary(
+        total=total,
+        skip=skip,
+        limit=limit,
+        items=items,
+    )
 
 from .routers import workouts   # or whatever you named the file
+PaginatedDailySummary.model_rebuild()
 
