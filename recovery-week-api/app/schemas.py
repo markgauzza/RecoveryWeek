@@ -2,6 +2,11 @@ from pydantic import BaseModel
 from datetime import datetime
 from datetime import date
 
+class PaginatedDailySummary(BaseModel):
+    total: int
+    skip: int
+    limit: int
+    items: List[WorkoutDailySummary]
 
 class WorkoutTypeOut(BaseModel):
     WorkoutTypeId: int
