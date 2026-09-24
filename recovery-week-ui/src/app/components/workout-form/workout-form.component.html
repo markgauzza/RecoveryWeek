@@ -8,8 +8,8 @@
   [disabled]="loading || !!error"
 >
   <option [ngValue]="null" disabled>Select a type...</option>
-  <option *ngFor="let type of workoutTypes" [ngValue]="type.id">
-    {{ type.name }}
+  <option *ngFor="let type of workoutTypes" [ngValue]="type.WorkoutTypeId">
+    {{ type.WorkoutName }}
   </option>
 </select>
 

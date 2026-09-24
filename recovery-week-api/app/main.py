@@ -2,7 +2,7 @@ from typing import List
 from fastapi import Query
 
 from sqlalchemy import func, case, cast, Date
-
+from sqlalchemy.exc import IntegrityError
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import get_db
@@ -10,6 +10,8 @@ from app.database import engine, Base
 from app.routers import items
 from app.schemas import WorkoutCreate, WorkoutResponse, WorkoutOut, WorkoutDailySummary, WorkoutTypeOut
 from app.models import Workout, WorkoutType
+from datetime import datetime
+
 
 
 Base.metadata.create_all(bind=engine)  # for small apps; prefer Alembic later
@@ -33,19 +35,29 @@ def create_workout(workout: WorkoutCreate, db: Session = Depends(get_db)):
         WorkoutDate=workout.WorkoutDate,       # None → DB default
         TotalSeconds=workout.TotalSeconds,
         Sequence=workout.Sequence,
+        CreateDate=datetime.now()
     )
 
     try:
         db.add(db_workout)
         db.commit()
         db.refresh(db_workout)
-    except IntegrityError:
+
+    except IntegrityError as e:
         db.rollback()
+
+    
+        print(f"IntegrityError: {e.orig}")   # or use logging
+
         raise HTTPException(
             status_code=400,
-            detail="Workout with this WorkoutTypeId + Sequence already exists, "
-                   "or invalid WorkoutTypeId (foreign key)."
+            detail={
+                "message": "Could not create workout",
+                "database_error": str(e.orig),           # MySQL message
+                "statement": str(e.statement) if e.statement else None,
+            }
         )
+
 
     return db_workout
 

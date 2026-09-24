@@ -7,8 +7,8 @@ import { WorkoutService, WorkoutType } from '../../services/workout';
   selector: 'app-workout-form',
   standalone: true,                    // remove if you're still using NgModules
   imports: [CommonModule, FormsModule],
-  templateUrl: './workout-form.component.html',
-  styleUrls: ['./workout-form.component.css']
+  templateUrl: './workout-form.component.html'
+  
 })
 export class WorkoutFormComponent implements OnInit {
   workoutTypes: WorkoutType[] = [];
