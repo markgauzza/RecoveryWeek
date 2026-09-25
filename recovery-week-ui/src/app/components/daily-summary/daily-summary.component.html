@@ -1,7 +1,19 @@
+<div class="toolbar">
+  <button type="button" class="btn-add" (click)="toggleForm()">
+    {{ showForm ? '✕' : '+' }}
+  </button>
+</div>
+
+<app-workout-form
+  *ngIf="showForm"
+  (saved)="onWorkoutSaved()"
+  (cancelled)="onFormCancelled()"
+></app-workout-form>
+
 <div *ngIf="loading">Loading...</div>
 <div *ngIf="error" class="error">{{ error }}</div>
-
-<table *ngIf="!loading && !error" class="summary-grid">
+<div>{{ loading }}</div>
+<table *ngIf="!loading" class="summary-grid">
   <thead>
     <tr>
       <th>Date</th>
@@ -19,7 +31,7 @@
       <td>{{ row.Sequence }}</td>
       <td>{{ row.DayParity }}</td>
     </tr>
-    <tr *ngIf="summaries.length === 0">
+    <tr *ngIf="!error && summaries.length === 0">
       <td colspan="5">No summaries found.</td>
     </tr>
   </tbody>

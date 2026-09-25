@@ -1,17 +1,52 @@
-<div *ngIf="loading">Loading workout types...</div>
-<div *ngIf="error" class="error">{{ error }}</div>
+<form class="workout-form" (ngSubmit)="submit()">
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="loadingTypes">Loading workout types...</div>
+{{ loadingTypes }}
+  <label for="workoutType">Workout Type *</label>
+  <select
+    id="workoutType"
+    name="workoutType"
+    [(ngModel)]="selectedTypeId"
+    [disabled]="loadingTypes"
+    required
+  >
+    <option [ngValue]="null" disabled>Select a type...</option>
+    <option *ngFor="let type of workoutTypes" [ngValue]="type.WorkoutTypeId">
+      {{ type.WorkoutName }}
+    </option>
+  </select>
 
-<label for="workoutType">Workout Type</label>
-<select
-  id="workoutType"
-  [(ngModel)]="selectedTypeId"
-  [disabled]="loading || !!error"
->
-  <option [ngValue]="null" disabled>Select a type...</option>
-  <option *ngFor="let type of workoutTypes" [ngValue]="type.WorkoutTypeId">
-    {{ type.WorkoutName }}
-  </option>
-</select>
+  <label for="workoutDate">Workout Date *</label>
+  <input
+    id="workoutDate"
+    name="workoutDate"
+    type="date"
+    [(ngModel)]="workoutDate"
+    required
+  />
 
-<!-- Optional: show the selected value -->
-<p *ngIf="selectedTypeId">Selected ID: {{ selectedTypeId }}</p>
+  <label>Duration (hh:mm)</label>
+  <div class="duration-row">
+    <input type="number" name="hours" [(ngModel)]="hours" min="0" max="60" placeholder="hh" />
+    <span>:</span>
+    <input type="number" name="minutes" [(ngModel)]="minutes" min="0" max="60" placeholder="mm" />
+  </div>
+
+  <label for="sequence">Sequence * (1–6)</label>
+  <input
+    id="sequence"
+    name="sequence"
+    type="number"
+    [(ngModel)]="sequence"
+    min="1"
+    max="6"
+    required
+  />
+
+  <div class="form-actions">
+    <button type="submit" [disabled]="saving || loadingTypes">
+      {{ saving ? 'Saving...' : 'Save' }}
+    </button>
+    <button type="button" (click)="cancel()" [disabled]="saving">Cancel</button>
+  </div>
+</form>

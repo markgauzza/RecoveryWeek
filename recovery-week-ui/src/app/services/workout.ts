@@ -14,20 +14,30 @@ export interface WorkoutType {
 export class WorkoutService {
   private apiUrl = 'http://localhost:8000/api';   // change if your API is on a different host/port
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getWorkoutTypes(): Observable<WorkoutType[]> {
     return this.http.get<WorkoutType[]>(`${this.apiUrl}/workouts/types`);
   }
 
-getDailySummaries(skip = 0, limit = 30): Observable<PaginatedDailySummary> {
-  const params = new HttpParams()
-    .set('skip', skip)
-    .set('limit', limit);
+  createWorkout(body: {
+    WorkoutTypeId: number;
+    WorkoutDate: string;
+    TotalSeconds: number;
+    Sequence: number;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/workouts/`, body);
+    // baseUrl = 'http://localhost:8000/api/workouts'
+  }
 
-  return this.http.get<PaginatedDailySummary>(
-    `${this.apiUrl}/workouts/daily-summary`,
-    { params }
-  );
-}
+  getDailySummaries(skip = 0, limit = 30): Observable<PaginatedDailySummary> {
+    const params = new HttpParams()
+      .set('skip', skip)
+      .set('limit', limit);
+
+    return this.http.get<PaginatedDailySummary>(
+      `${this.apiUrl}/workouts/daily-summary`,
+      { params }
+    );
+  }
 } 

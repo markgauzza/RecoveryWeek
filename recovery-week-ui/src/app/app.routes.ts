@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
-import { WorkoutFormComponent } from './components/workout-form/workout-form.component';
 import { DailySummaryComponent } from './components/daily-summary/daily-summary.component';
 
-
 export const routes: Routes = [
+  // home
+  { path: '', component: DailySummaryComponent },
 
-  { path: 'workout', component: WorkoutFormComponent },
-  // optional: redirect unknown paths
-  { path: '**', redirectTo: '' },
+  // optional explicit path
   { path: 'daily-summary', component: DailySummaryComponent },
 
+  // wildcard LAST only
+  { path: '**', redirectTo: '' },
 ];
