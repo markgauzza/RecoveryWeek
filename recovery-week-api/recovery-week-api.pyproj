@@ -29,7 +29,7 @@
     <Compile Include="app\database.py" />
     <Compile Include="app\main.py" />
     <Compile Include="app\models.py" />
-    <Compile Include="app\routers\items.py" />
+    <Compile Include="app\routers\reports.py" />
     <Compile Include="app\routers\workouts.py" />
     <Compile Include="app\schemas.py" />
   </ItemGroup>

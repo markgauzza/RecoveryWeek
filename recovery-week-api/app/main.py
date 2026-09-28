@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import Query
+from app.routers import reports
 
 from sqlalchemy import func, case, cast, Date
 from sqlalchemy.exc import IntegrityError
@@ -28,6 +29,8 @@ app.add_middleware(
 )
 
 app.include_router(workouts.router, prefix="/api")
+
+app.include_router(reports.router, prefix="/api")
 
 
 PaginatedDailySummary.model_rebuild()

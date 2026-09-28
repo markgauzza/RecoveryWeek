@@ -2,6 +2,18 @@ from pydantic import BaseModel
 from datetime import datetime
 from datetime import date
 
+class WorkoutDayOfWeekReportRow(BaseModel):
+    Workout: str
+    Sunday: int
+    Monday: int
+    Tuesday: int
+    Wednesday: int
+    Thursday: int
+    Friday: int
+    Saturday: int
+    Odd: int
+    Even : int
+
 class PaginatedDailySummary(BaseModel):
     total: int
     skip: int
