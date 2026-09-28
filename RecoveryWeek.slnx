@@ -1,4 +1,7 @@
 <Solution>
+  <Project Path="batch/batch.pyproj" Type="888888a0-9f3d-457c-b088-3a5042f75d52" Id="bc328ea4-daad-4677-9988-076760001e84">
+    <Build Project="false" />
+  </Project>
   <Project Path="recovery-week-api/recovery-week-api.pyproj" Type="888888a0-9f3d-457c-b088-3a5042f75d52" Id="faf46311-8692-4800-8d74-8efd816e4c6e">
     <Build Project="false" />
   </Project>
