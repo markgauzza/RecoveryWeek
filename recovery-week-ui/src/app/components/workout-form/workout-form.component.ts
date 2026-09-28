@@ -31,8 +31,7 @@ export class WorkoutFormComponent implements OnInit {
 
   constructor(private workoutService: WorkoutService) {}
 
-  ngOnInit(): void {
-    debugger;
+  ngOnInit(): void {    
     this.loadWorkoutTypes();
   }
 

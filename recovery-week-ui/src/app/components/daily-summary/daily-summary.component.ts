@@ -32,10 +32,11 @@ export class DailySummaryComponent implements OnInit {
   limit = 30;
 
   constructor(private workoutService: WorkoutService) {   
+        afterNextRender(() => this.loadSummaries());
+
   }
 
-  ngOnInit(): void {
-    debugger;
+  ngOnInit(): void {    
     if (isPlatformBrowser(this.platformId)) {
 
       this.loadSummaries();
@@ -73,11 +74,14 @@ export class DailySummaryComponent implements OnInit {
           console.log('daily-summary response', data);
           this.summaries = data?.items ?? [];
           this.total = data?.total ?? 0;
+          this.cdr.detectChanges();
+
         },
         error: (err) => {
           console.error('daily-summary error', err);
           this.error = err.message || 'Failed to load daily summaries';
           this.summaries = [];
+          this.cdr.detectChanges();
         },
       });
   }
