@@ -1,6 +1,10 @@
-import { Component, 
+import {
+  Component,
   ChangeDetectorRef,
-  OnInit, inject, PLATFORM_ID, afterNextRender  } from '@angular/core';
+  NgZone,
+  signal,
+  OnInit, inject, PLATFORM_ID, afterNextRender
+} from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { WorkoutService } from '../../services/workout';
@@ -20,26 +24,25 @@ import { finalize } from 'rxjs/operators';
 })
 export class DailySummaryComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
-  private cdr = inject(ChangeDetectorRef);
+  private workoutService = inject(WorkoutService);
+  private ngZone = inject(NgZone);
 
   showForm = false;
-  summaries: WorkoutDailySummary[] = [];
+  summaries = signal<WorkoutDailySummary[]>([]);
   total = 0;
   loading = false;
   error: string | null = null;
 
-  skip = 0;
-  limit = 30;
+  skip = signal<number>(0);
+  limit = signal<number>(30);
 
-  constructor(private workoutService: WorkoutService) {   
-        afterNextRender(() => this.loadSummaries());
+  constructor() { }
 
-  }
-
-  ngOnInit(): void {    
+  ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
 
       this.loadSummaries();
+
     }
   }
 
@@ -54,45 +57,41 @@ export class DailySummaryComponent implements OnInit {
 
   onFormCancelled(): void {
     this.showForm = false;
-  }  
+  }
 
   loadSummaries(): void {
     this.loading = true;
     this.error = null;
-    this.cdr.detectChanges(); // show loading state immediately
 
-    this.workoutService.getDailySummaries(this.skip, this.limit)
+    this.workoutService.getDailySummaries(this.skip(), this.limit())
       .pipe(
         finalize(() => {
-            this.loading = false;
-            console.log('finalize loading=', this.loading, 'rows=', this.summaries.length);
-            this.cdr.detectChanges();
+          this.loading = false;
+          // console.log('finalize loading=', this.loading, 'rows=', this.summaries.length);
         })
       )
       .subscribe({
         next: (data) => {
           console.log('daily-summary response', data);
-          this.summaries = data?.items ?? [];
+          this.summaries.set(data?.items ?? []);
           this.total = data?.total ?? 0;
-          this.cdr.detectChanges();
 
         },
         error: (err) => {
           console.error('daily-summary error', err);
           this.error = err.message || 'Failed to load daily summaries';
-          this.summaries = [];
-          this.cdr.detectChanges();
-        },
+          this.summaries.set([]);
+        }
       });
   }
 
   nextPage(): void {
-    this.skip += this.limit;
+    this.skip.set(this.skip() + this.limit());
     this.loadSummaries();
   }
 
   prevPage(): void {
-    this.skip = Math.max(0, this.skip - this.limit);
+    this.skip.set(Math.max(0, this.skip() - this.limit()));
     this.loadSummaries();
   }
 }

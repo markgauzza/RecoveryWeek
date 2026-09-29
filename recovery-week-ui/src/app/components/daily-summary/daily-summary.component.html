@@ -24,21 +24,21 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let row of summaries">
+    <tr *ngFor="let row of summaries()">
       <td>{{ row.WorkoutDate }}</td>
       <td>{{ row.DayOfWeek }}</td>
       <td>{{ row.Workouts }}</td>
       <td>{{ row.Sequence }}</td>
       <td>{{ row.DayParity }}</td>
     </tr>
-    <tr *ngIf="!error && summaries.length === 0">
+    <tr *ngIf="!error && summaries().length === 0">
       <td colspan="5">No summaries found.</td>
     </tr>
   </tbody>
 </table>
 
 <div class="paging" *ngIf="!loading && !error">
-  <button (click)="prevPage()" [disabled]="skip === 0">Previous</button>
-  <span>Showing from {{ skip + 1 }}</span>
-  <button (click)="nextPage()" [disabled]="summaries.length < limit">Next</button>
+  <button (click)="prevPage()" [disabled]="skip() === 0 || loading">Previous</button>
+  <span>Showing from {{ skip() + 1 }} to {{ skip() + summaries().length }} of {{ total }}</span>
+  <button (click)="nextPage()" [disabled]="skip() + limit() >= total || loading">Next</button>
 </div>
