@@ -1,0 +1,35 @@
+<div class="reports">
+  <h1>Reports</h1>
+
+  <nav class="tabs" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.active]="activeTab === 'by-day'"
+      [attr.aria-selected]="activeTab === 'by-day'"
+      (click)="selectTab('by-day')"
+    >
+      By day of week
+    </button>
+
+    <!-- Add more tabs later -->
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.active]="activeTab === 'other'"
+      [attr.aria-selected]="activeTab === 'other'"
+      (click)="selectTab('other')"
+      disabled
+    >
+      More reports (soon)
+    </button>
+  </nav>
+
+  <div class="tab-panel" role="tabpanel">
+    <app-workout-by-day-report *ngIf="activeTab === 'by-day'" />
+
+    <p *ngIf="activeTab === 'other'">Next report goes here.</p>
+  </div>
+</div>

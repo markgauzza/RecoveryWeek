@@ -27,7 +27,7 @@
     <Folder Include="import-files\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="import-files\import.csv" />
+    <Content Include="import-files\workouts.csv" />
     <Content Include="requirements.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

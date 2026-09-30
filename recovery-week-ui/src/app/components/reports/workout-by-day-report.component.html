@@ -1,0 +1,17 @@
+<div *ngIf="loading && rows.length === 0">Loading report...</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<table *ngIf="rows.length > 0" class="report-grid">
+  <thead>
+    <tr>
+      <th *ngFor="let col of columns">{{ col }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of rows">
+      <td *ngFor="let col of columns">{{ cellValue(row, col) }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="!loading && rows.length === 0 && !error">No data for this report.</p>
